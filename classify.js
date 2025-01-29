@@ -41,9 +41,12 @@ const K = 3; // number of nearest neighbors to check for each sample
  * 				excluding index 0 and the last index
 */
 function calculateDistance(sample1, sample2){
-	/* TODO: delete the line below and write your own code here! */
-	return -1;
-
+	let euclideanDistance = 0;
+	// ignore the ID # and label at the end (index 0 and last index)
+	for(let i=1; i<sample1.length-1; i++){
+		euclideanDistance += Math.pow(sample1[i] - sample2[i], 2);
+	}
+	return Math.sqrt(euclideanDistance);
 }
 
 
@@ -83,12 +86,16 @@ function getClosestKPoints(testSample, trainData, K){
 	let pointDistances = [];
 	
 	for (let trainSample of trainData){
-		// TODO: populate pointDistances here as described in part (1) of the strategy
-
+		let distance = calculateDistance(testSample, trainSample);
+		pointDistances.push({
+			"id": trainSample[0],
+			"distance": distance,
+			"label": trainSample[trainSample.length-1]
+		});
 	}
 
-	// TODO: delete the line below and write your code for part (2) of the strategy!
-	return pointDistances;
+	let sortedPoints = pointDistances.sort((a, b) => a.distance - b.distance);
+	return sortedPoints.slice(0, K);
 }
 
 
@@ -114,8 +121,17 @@ function predictSample(testSample, trainData, K){
 
 	let closestKPoints = getClosestKPoints(testSample, trainData, K);
 	
-	// TODO: delete the line below and write your own code here!
-	return -1;
+	let benignCount = 0;
+	let malignantCount = 0;
+	for (let point of closestKPoints){
+		if (point.label === 0) {
+			benignCount++;
+		} else {
+			malignantCount++;
+		}
+	}
+	if (benignCount > malignantCount) return 0;
+	else return 1;
 }
 
 
